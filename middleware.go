@@ -1,4 +1,4 @@
-package apmiris
+package main
 
 import (
 	"fmt"
