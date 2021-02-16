@@ -1,4 +1,4 @@
-module github.com/fari-99/apmiris
+module github.com/mataharibiz/apmiris
 
 go 1.13
 

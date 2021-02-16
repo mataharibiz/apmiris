@@ -6,7 +6,7 @@ Reference : [issue](https://github.com/elastic/apm-agent-go/issues/891)
 
 ## How to use
 ```bash
-    go get -u github.com/fari-99/apmiris
+    go get -u github.com/mataharibiz/apmiris
 ```
 ### Setup ENV
 first you need too setup basic environment variable, for more advance setup please refer to [apm configuration](https://www.elastic.co/guide/en/apm/agent/go/current/configuration.html).
@@ -22,7 +22,7 @@ package main
 
 import (
     "fmt"
-	"github.com/fari-99/apmiris"
+	"github.com/mataharibiz/apmiris"
 	"github.com/kataras/iris/v12"
 )
 
