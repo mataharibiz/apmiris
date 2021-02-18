@@ -16,7 +16,7 @@ export ELASTIC_APM_SERVER_URL=http://your.apm.server:port
 export ELASTIC_APM_SECRET_TOKEN=apm-token-app
 ```
 
-### Code
+### Example Code Middleware
 ```go
 package main
 
@@ -49,6 +49,38 @@ func main() {
     }))
         
     app.Get("/test", func(ctx iris.Context) {
+        ctx.StatusCode(iris.StatusOK)
+        _, _ = ctx.JSON(iris.Map{
+            "message": "You've been mixing with the wrong crowd.",
+        })
+        return
+    })
+        
+    _ = app.Listen(":8080")
+}
+```
+
+### Example Code Error
+```go
+package main
+
+import (
+    "fmt"
+	"github.com/mataharibiz/apmiris"
+	"github.com/kataras/iris/v12"
+)
+
+func main() {
+    app := iris.New()
+    
+    app.Get("/test", func(ctx iris.Context) {
+        apmiris.NewApmError(nil, ctx).
+            SetAction("test error", "controller.role"). 
+            SetLevelError("lowest"). // you can use custom level error
+            SetTitle("Error when get input json"). // title for your error
+            SetAdditionalData("additional data").
+            SendError(fmt.Errorf("this is the error"))
+
         ctx.StatusCode(iris.StatusOK)
         _, _ = ctx.JSON(iris.Map{
             "message": "You've been mixing with the wrong crowd.",
