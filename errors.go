@@ -102,6 +102,7 @@ func (base *apmError) SendError(errorDetails error) {
 	}
 
 	span := tx.StartSpanOptions(spanName, spanType, apm.SpanOptions{Start: time.Now()})
+	span.SetStacktrace(1)
 	defer span.End()
 
 	if base.additionalData != nil {
