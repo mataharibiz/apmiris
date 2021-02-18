@@ -133,6 +133,7 @@ func (m *middleware) handle(irisCtx iris.Context) {
 			irisCtx.StopExecution()
 
 			span := tx.StartSpanOptions("[PANIC]", "recovered.panic", apm.SpanOptions{Start: time.Now()})
+			span.SetStacktrace(1)
 			defer span.End()
 
 			e := m.tracer.Recovered(err)
