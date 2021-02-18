@@ -24,9 +24,8 @@ type apmError struct {
 type OptionError func(*apmError)
 
 type span struct {
-	SpanName    string
-	SpanType    string
-	SpanOptions apm.SpanOptions
+	SpanName string
+	SpanType string
 }
 
 func NewApmError(userData *UserData, ctx iris.Context, opts ...OptionError) *apmError {
@@ -35,11 +34,7 @@ func NewApmError(userData *UserData, ctx iris.Context, opts ...OptionError) *apm
 		userData:  userData,
 		irisCtx:   ctx,
 		errorLogs: &apm.ErrorLogRecord{},
-		spans: &span{
-			SpanOptions: apm.SpanOptions{
-				Start: time.Now(),
-			},
-		},
+		spans:     &span{},
 	}
 
 	for _, opt := range opts {
@@ -75,9 +70,6 @@ func (base *apmError) SetAction(spanName string, spanType string) *apmError {
 	base.spans = &span{
 		SpanName: spanName,
 		SpanType: spanType,
-		SpanOptions: apm.SpanOptions{
-			Start: time.Now(),
-		},
 	}
 
 	return base
@@ -109,7 +101,7 @@ func (base *apmError) SendError(errorDetails error) {
 		spanType = base.spans.SpanType
 	}
 
-	span := tx.StartSpanOptions(spanName, spanType, base.spans.SpanOptions)
+	span := tx.StartSpanOptions(spanName, spanType, apm.SpanOptions{Start: time.Now()})
 	defer span.End()
 
 	if base.additionalData != nil {
