@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/kataras/iris/v12"
 
@@ -131,6 +132,9 @@ func (m *middleware) handle(irisCtx iris.Context) {
 			irisCtx.StatusCode(http.StatusInternalServerError)
 			irisCtx.StopExecution()
 
+			span := tx.StartSpanOptions("[PANIC]", "recovered.panic", apm.SpanOptions{Start: time.Now()})
+			defer span.End()
+
 			e := m.tracer.Recovered(err)
 			e.SetTransaction(tx)
 			setContext(&e.Context, irisCtx, body)
@@ -139,6 +143,9 @@ func (m *middleware) handle(irisCtx iris.Context) {
 
 		irisCtx.ResponseWriter().WriteHeader(irisCtx.GetStatusCode())
 		tx.Result = apmhttp.StatusCodeResult(irisCtx.ResponseWriter().StatusCode())
+
+		span := tx.StartSpanOptions("[MIDDLEWARE]", "middleware", apm.SpanOptions{Start: time.Now()})
+		defer span.End()
 
 		if tx.Sampled() {
 			setContext(&tx.Context, irisCtx, body)
