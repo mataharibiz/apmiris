@@ -18,6 +18,7 @@ type apmError struct {
 
 	errorLogs *apm.ErrorLogRecord
 	spans     *span
+	culprit   string
 }
 
 // Option sets options for tracing.
@@ -61,6 +62,11 @@ func (base *apmError) SetTitle(title string) *apmError {
 
 func (base *apmError) SetLevelError(level string) *apmError {
 	base.errorLogs.Level = level
+	return base
+}
+
+func (base *apmError) SetCulprit(culprit string) *apmError {
+	base.culprit = culprit
 	return base
 }
 
@@ -116,6 +122,11 @@ func (base *apmError) SendError(errorDetails error) {
 	e := base.tracer.NewErrorLog(*errorLogs)
 	e.SetTransaction(tx)
 	e.SetSpan(span)
+
+	if e.Culprit == "" && base.culprit != "" {
+		e.Culprit = base.culprit
+	}
+
 	setContext(&e.Context, irisCtx, body)
 	e.Send()
 }
