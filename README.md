@@ -16,6 +16,67 @@ export ELASTIC_APM_SERVER_URL=http://your.apm.server:port
 export ELASTIC_APM_SECRET_TOKEN=apm-token-app
 ```
 
+### Example Default Recover from PANIC
+this example doesn't need context
+```go
+package main
+
+import (
+    "fmt"
+	"github.com/mataharibiz/apmiris"
+	"github.com/kataras/iris/v12"
+)
+
+func main() {
+    app := iris.New()
+
+    app.Get("/test-panic", func(context iris.Context) {
+        defer func() {
+            apmiris.RecoverApmDefault("test panic")
+
+            if err := recover(); err != nil {
+                context.StatusCode(iris.StatusOK)
+                _, _ = context.JSON(iris.Map{
+                    "message": "You just recovered",
+                })
+            }
+        }()
+
+        panic("panic test")
+        return
+    })
+        
+    _ = app.Listen(":8080")
+}
+```
+
+### Example Default Send Error
+```go
+package main
+
+import (
+    "fmt"
+	"github.com/mataharibiz/apmiris"
+	"github.com/kataras/iris/v12"
+)
+
+func main() {
+    app := iris.New()
+
+    app.Get("/test-error", func(ctx iris.Context) {
+        apmiris.SendErrorApmDefault(fmt.Errorf("this is error"))
+
+        ctx.StatusCode(iris.StatusNotFound)
+        _, _ = ctx.JSON(iris.Map{
+            "message": "Testing error",
+        })
+        return
+    })
+        
+    _ = app.Listen(":8080")
+}
+```
+
 ### Example Code Middleware
 ```go
 package main
