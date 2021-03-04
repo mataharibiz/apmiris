@@ -122,6 +122,7 @@ func (base *apmError) SendError(errorDetails error) {
 	e := base.tracer.NewErrorLog(*errorLogs)
 	e.SetTransaction(tx)
 	e.SetSpan(span)
+	e.SetStacktrace(1)
 
 	if e.Culprit == "" && base.culprit != "" {
 		e.Culprit = base.culprit
